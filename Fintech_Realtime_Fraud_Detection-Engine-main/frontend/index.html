@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentinelStream — Real-Time Fraud Detection Engine</title>
+  <meta name="description" content="SentinelStream is a high-throughput, real-time fraud detection engine for financial transactions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z" fill="url(#logoGrad)" />
+          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="24" y2="24">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div>
+        <span class="logo-name">SentinelStream</span>
+        <span class="logo-sub">Fraud Detection Engine</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="javascript:void(0)" class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="javascript:void(0)" class="nav-item" data-tab="submit" onclick="switchTab('submit', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        New Transaction
+      </a>
+      <a href="javascript:void(0)" class="nav-item" data-tab="history" onclick="switchTab('history', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Transaction History
+      </a>
+      <a href="javascript:void(0)" class="nav-item" data-tab="rules" onclick="switchTab('rules', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+        Detection Rules
+      </a>
+    </nav>
+
+    <div class="sidebar-status">
+      <div class="status-dot"></div>
+      <span>Engine Active</span>
+    </div>
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <main class="main-content">
+
+    <!-- ─── HEADER ─────────────────────────────── -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title" id="page-title">Dashboard Overview</h1>
+        <span class="page-subtitle" id="page-subtitle">Real-time financial monitoring & threat analysis</span>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <span class="pulse-dot"></span>
+          LIVE MONITORING
+        </div>
+        <div class="header-time" id="headerTime"></div>
+      </div>
+    </header>
+
+    <!-- ─── DASHBOARD TAB ───────────────────────── -->
+    <section class="tab-content active" id="tab-dashboard">
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card" id="card-total">
+          <div class="stat-icon blue">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total Transactions</span>
+            <span class="stat-value" id="total-txn">—</span>
+          </div>
+        </div>
+
+        <div class="stat-card" id="card-safe">
+          <div class="stat-icon green">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Safe Transactions</span>
+            <span class="stat-value" id="safe-txn">—</span>
+          </div>
+        </div>
+
+        <div class="stat-card" id="card-fraud">
+          <div class="stat-icon red">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Fraud Detected</span>
+            <span class="stat-value" id="fraud-txn">—</span>
+          </div>
+        </div>
+
+        <div class="stat-card" id="card-rate">
+          <div class="stat-icon purple">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Fraud Rate</span>
+            <span class="stat-value" id="fraud-rate">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volume Cards -->
+      <div class="volume-grid">
+        <div class="volume-card">
+          <span class="vol-label">Total Transaction Volume</span>
+          <span class="vol-value" id="total-vol">₹—</span>
+        </div>
+        <div class="volume-card fraud-vol">
+          <span class="vol-label">Fraud Blocked Volume</span>
+          <span class="vol-value" id="fraud-vol">₹—</span>
+        </div>
+      </div>
+
+      <!-- Risk Breakdown Bar -->
+      <div class="risk-bar-card">
+        <h3 class="card-title">Transaction Risk Distribution</h3>
+        <div class="risk-bar-container" id="riskBar">
+          <div class="risk-segment low" id="seg-low" style="width:0%">Low</div>
+          <div class="risk-segment medium" id="seg-medium" style="width:0%">Med</div>
+          <div class="risk-segment high" id="seg-high" style="width:0%">High</div>
+          <div class="risk-segment critical" id="seg-critical" style="width:0%">Critical</div>
+        </div>
+        <div class="risk-legend">
+          <span class="legend-item low">● Low Risk</span>
+          <span class="legend-item medium">● Medium Risk</span>
+          <span class="legend-item high">● High Risk</span>
+          <span class="legend-item critical">● Critical Risk</span>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="recent-card">
+        <div class="card-header-row">
+          <h3 class="card-title">Recent Transactions</h3>
+          <button class="refresh-btn" onclick="loadDashboard()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="table-container">
+          <table class="txn-table" id="recent-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>User ID</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Risk</th>
+                <th>Score</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody">
+              <tr><td colspan="7" class="empty-row">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ─── SUBMIT TRANSACTION TAB ──────────────── -->
+    <section class="tab-content" id="tab-submit">
+      <div class="submit-wrapper">
+
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-icon">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+            </div>
+            <div>
+              <h2>Submit Transaction</h2>
+              <p>Run a transaction through the SentinelStream detection engine</p>
+            </div>
+          </div>
+
+          <form id="txnForm" onsubmit="submitTransaction(event)">
+            <div class="form-group">
+              <label for="userId">User ID <span class="required">*</span></label>
+              <input type="text" id="userId" placeholder="e.g. USR_10042" required minlength="3" maxlength="50" />
+              <span class="hint">Unique user identifier (no spaces)</span>
+            </div>
+
+            <div class="form-group">
+              <label for="amount">Transaction Amount (₹) <span class="required">*</span></label>
+              <div class="amount-input-wrap">
+                <span class="currency-prefix">₹</span>
+                <input type="number" id="amount" placeholder="e.g. 7500" required min="1" step="0.01" />
+              </div>
+              <div class="threshold-hints">
+                <span class="hint-tag safe">✓ Safe: below ₹5,000</span>
+                <span class="hint-tag fraud">✕ Fraud: above ₹5,000</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description <span class="optional">(optional)</span></label>
+              <input type="text" id="description" placeholder="e.g. Online purchase - Electronics" maxlength="200" />
+            </div>
+
+            <div class="form-group">
+              <label for="ipAddress">IP Address <span class="optional">(optional)</span></label>
+              <input type="text" id="ipAddress" placeholder="e.g. 192.168.1.10" />
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+              Analyze Transaction
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="result-panel" id="resultPanel" style="display:none;">
+          <div class="result-header" id="resultHeader">
+            <div class="result-icon" id="resultIcon"></div>
+            <div>
+              <h2 id="resultStatus">—</h2>
+              <p id="resultMessage">—</p>
+            </div>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-item">
+              <span class="result-label">Transaction ID</span>
+              <span class="result-val mono" id="res-txnId">—</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">User ID</span>
+              <span class="result-val" id="res-userId">—</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Amount</span>
+              <span class="result-val" id="res-amount">—</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Risk Level</span>
+              <span class="result-val" id="res-risk">—</span>
+            </div>
+            <div class="result-item full">
+              <span class="result-label">Risk Score</span>
+              <div class="score-bar-wrap">
+                <div class="score-bar-bg">
+                  <div class="score-bar-fill" id="scoreBarFill" style="width:0%"></div>
+                </div>
+                <span class="score-num" id="res-score">0</span>
+              </div>
+            </div>
+            <div class="result-item full" id="flaggedWrap">
+              <span class="result-label">Flagged Reason</span>
+              <span class="result-val flag-reason" id="res-reason">—</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Timestamp</span>
+              <span class="result-val mono small" id="res-ts">—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ─── HISTORY TAB ─────────────────────────── -->
+    <section class="tab-content" id="tab-history">
+      <div class="history-card">
+        <div class="card-header-row">
+          <h3 class="card-title">All Transaction Records</h3>
+          <div class="history-filters">
+            <select id="filterStatus" onchange="loadHistory()">
+              <option value="">All Status</option>
+              <option value="Safe">Safe</option>
+              <option value="Fraud">Fraud</option>
+            </select>
+            <input type="text" id="filterUser" placeholder="Filter by User ID" oninput="debounceHistory()" />
+            <button class="refresh-btn" onclick="loadHistory()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="txn-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>User ID</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Risk</th>
+                <th>Score</th>
+                <th>Flagged Reason</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <tr><td colspan="9" class="empty-row">Click Refresh to load records</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── RULES TAB ───────────────────────────── -->
+    <section class="tab-content" id="tab-rules">
+      <div class="rules-grid">
+
+        <div class="rule-card critical-rule">
+          <div class="rule-badge critical">CRITICAL</div>
+          <h3>Critical Amount Threshold</h3>
+          <div class="rule-amount">₹50,000+</div>
+          <p>Transactions exceeding ₹50,000 are immediately flagged as <strong>Critical risk</strong> and blocked as fraudulent.</p>
+          <div class="rule-score-tag">+80 Risk Score</div>
+        </div>
+
+        <div class="rule-card high-rule">
+          <div class="rule-badge high">HIGH</div>
+          <h3>High Amount Threshold</h3>
+          <div class="rule-amount">₹5,000 – ₹50,000</div>
+          <p>Transactions between ₹5,000 and ₹50,000 are flagged as <strong>High risk</strong> and marked as fraudulent. This is the <em>core rule</em> per system specification.</p>
+          <div class="rule-score-tag">+55 Risk Score</div>
+        </div>
+
+        <div class="rule-card medium-rule">
+          <div class="rule-badge medium">MEDIUM</div>
+          <h3>Medium Amount Watch Zone</h3>
+          <div class="rule-amount">₹2,000 – ₹5,000</div>
+          <p>Transactions in this range are marked as <strong>Medium risk</strong> but allowed to proceed with a caution flag.</p>
+          <div class="rule-score-tag">+20 Risk Score</div>
+        </div>
+
+        <div class="rule-card safe-rule">
+          <div class="rule-badge safe">SAFE</div>
+          <h3>Safe Zone</h3>
+          <div class="rule-amount">Below ₹2,000</div>
+          <p>Transactions below ₹2,000 with no suspicious metadata are classified as <strong>Low risk</strong> and approved instantly.</p>
+          <div class="rule-score-tag">0 Risk Score</div>
+        </div>
+
+        <div class="rule-card keyword-rule">
+          <div class="rule-badge fraud">KEYWORD</div>
+          <h3>Suspicious Description Keywords</h3>
+          <div class="rule-keywords">
+            <code>casino</code><code>gambling</code><code>bet</code><code>lottery</code>
+            <code>offshore</code><code>crypto transfer</code><code>anonymous</code><code>darkweb</code>
+          </div>
+          <p>Descriptions containing any of these keywords contribute an additional <strong>+40 risk score</strong> to the evaluation.</p>
+          <div class="rule-score-tag">+40 Risk Score</div>
+        </div>
+
+        <div class="rule-card round-rule">
+          <div class="rule-badge warning">HEURISTIC</div>
+          <h3>Round Number Heuristic</h3>
+          <div class="rule-amount">Exact multiples of ₹1,000 ≥ ₹5,000</div>
+          <p>Large round-number transactions are common in structuring attempts — a minor additional risk penalty is applied.</p>
+          <div class="rule-score-tag">+5 Risk Score</div>
+        </div>
+
+      </div>
+
+      <div class="decision-flow-card">
+        <h3 class="card-title">Decision Flow</h3>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-num">1</div>
+            <div class="flow-text">
+              <strong>API receives transaction</strong>
+              <span>POST /api/transaction → Pydantic validates payload</span>
+            </div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-num">2</div>
+            <div class="flow-text">
+              <strong>Rules evaluated</strong>
+              <span>All 5 rules applied, risk score accumulated</span>
+            </div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-num">3</div>
+            <div class="flow-text">
+              <strong>Verdict issued</strong>
+              <span>Safe / Fraud + risk level classification</span>
+            </div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-num">4</div>
+            <div class="flow-text">
+              <strong>Stored & returned</strong>
+              <span>Logged to SQLite, response sent to client</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
