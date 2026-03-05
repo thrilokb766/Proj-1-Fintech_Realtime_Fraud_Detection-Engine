@@ -185,3 +185,4 @@ def clear_transactions():
         return {"message": "All transaction records cleared successfully."}
     finally:
         conn.close()
+# Week 2: API improvements
