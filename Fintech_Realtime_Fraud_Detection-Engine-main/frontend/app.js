@@ -264,3 +264,4 @@ document.head.appendChild(style);
 
 // ── Init ──────────────────────────────────────────────────
 loadDashboard();
+// Week 4: UI improvements
